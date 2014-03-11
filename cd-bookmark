@@ -1,0 +1,57 @@
+# cd-bookmark - zsh plugin to bookmark directories to cd.
+#
+# Copyright (c) 2014 Hideaki Miyake
+# Licensed under the MIT License (MIT)
+#
+# Author : Hideaki Miyake (https://github.com/mollifier)
+# URL : https://github.com/mollifier/cd-bookmark
+#
+# How to set up
+#   Put cd-bookmark and _cd-bookmark files somewhere in your $fpath
+#   and add this line to your .zshrc:
+#
+#     autoload -Uz cd-bookmark
+#
+# Usage:
+#   cd-bookmark [PATH]
+#
+
+function cdb_print_usage()
+{
+    cat << EOF
+Usage: cd-bookmark [PATH]
+
+  -h           display this help and exit
+EOF
+}
+
+function cdb_print_error()
+{
+    echo "cd-bookmark: $@" 1>&2
+    echo "Try \`-h' option for more information." 1>&2
+}
+
+function cdbookmark() {
+
+  while getopts ':h' option; do
+    case $option in
+      h)
+        cdb_print_usage
+        return 0
+        ;;
+      :)
+        cdb_print_error "option requires an argument -- $OPTARG"
+        return 1
+        ;;
+      *)
+        cdb_print_error "invalid option -- $OPTARG"
+        return 1
+        ;;
+    esac
+  done
+  shift $(expr $OPTIND - 1)
+}
+
+cdbookmark "$@"
+
+# vim:set ft=zsh:
