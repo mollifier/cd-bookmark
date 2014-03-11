@@ -16,11 +16,16 @@
 #   cd-bookmark [PATH]
 #
 
+
+CD_BOOKMARK_FILE=~/.cdbookmark
+
 function cdb_print_usage()
 {
     cat << EOF
 Usage: cd-bookmark [PATH]
 
+  -c cd
+  -e edit
   -h           display this help and exit
 EOF
 }
@@ -31,6 +36,74 @@ function cdb_print_error()
     echo "Try \`-h' option for more information." 1>&2
 }
 
+bmls() {
+  cat "$CD_BOOKMARK_FILE" | sort -n
+}
+
+bmvi() {
+  # open CD_BOOKMARK_FILE with EDITOR.
+  ${EDITOR:-vi} "$CD_BOOKMARK_FILE"
+}
+
+bmadd() {
+  local bmdir=$PWD
+  local newid=$1
+
+  if __bm_path_list | grep -F -x "$bmdir" > /dev/null; then
+    echo "$bmdir is already in bm list" 1>&2
+    return 2
+  fi
+
+  if [ -n "$newid" ]; then
+    if __bm_id_list | grep -F -x "$newid" > /dev/null; then
+      echo "$newid is already used as bm id" 1>&2
+      return 3
+    fi
+  fi
+
+  if [ -z $newid ]; then
+    local maxid
+    maxid=$(__bm_id_list | grep '^[0-9][0-9]*$' | sort -n -r | head -1)
+    if [ -n "$maxid" ] && [ "$maxid" -ge 1 ]; then
+      newid=$((maxid + 1))
+    else
+      newid=1
+    fi
+  fi
+
+  echo "$newid|$bmdir" >> "$CD_BOOKMARK_FILE"
+}
+
+bm() {
+  local bmid=$1
+  if [ -z "$bmid" ]; then
+    bmls
+    return
+  fi
+
+  local bmdir=$(__bm_get "$bmid")
+  if [ -z "$bmdir" ]; then
+    echo "$bmid is not in bm list" 1>&2
+    return 1
+  fi
+
+  cd "$bmdir"
+}
+
+__bm_get() {
+  escaped_bmid=$(echo "$1" | sed -e 's/[^a-zA-Z0-9<>]/\\&/g')
+  cat "$CD_BOOKMARK_FILE" | grep -E "^${escaped_bmid}\\|" | cut -d '|' -f 2 | head -n 1
+}
+
+__bm_path_list() {
+  cat "$CD_BOOKMARK_FILE" | cut -d '|' -f 2
+}
+
+__bm_id_list() {
+  cat "$CD_BOOKMARK_FILE" | cut -d '|' -f 1
+}
+
+# main function
 function cdbookmark() {
 
   while getopts ':h' option; do
