@@ -16,22 +16,33 @@
 #   cd-bookmark [PATH]
 #
 
+typeset -r SCRIPT_NAME="cd-bookmark"
 typeset -r CD_BOOKMARK_FILE=~/.cdbookmark
 
 function print_usage()
 {
     cat << EOF
-Usage: cd-bookmark [PATH]
+Usage: $SCRIPT_NAME -a [BOOKMARK_ID]  (1st form)
+  or:  $SCRIPT_NAME [-c] BOOKMARK_ID  (2nd form)
+  or:  $SCRIPT_NAME [-l]              (3rd form)
+$SCRIPT_NAME is a command to bookmark directories.
+In the 1st form, add current directory to bookmark with BOOKMARK_ID.
+BOOKMARK_ID is used as a key in bookmark.
+In the 2nd form, find directory by BOOKMARK_ID and change directory to it.
+In the 3rd form, list current bookmark.
 
-  -c cd
-  -e edit
-  -h           display this help and exit
+  -a [BOOKMARK_ID]   add current directory to bookmark
+                     with no BOOKMARK_ID, automatically use free ID number as BOOKMARK_ID
+  -c BOOKMARK_ID     change directory which is identified by BOOKMARK_ID
+  -l                 list bookmark
+  -e                 edit bookmark file
+  -h                 display this help and exit
 EOF
 }
 
 function print_error()
 {
-    echo "cd-bookmark: $@" 1>&2
+    echo "$SCRIPT_NAME: $@" 1>&2
     echo "Try \`-h' option for more information." 1>&2
 }
 
