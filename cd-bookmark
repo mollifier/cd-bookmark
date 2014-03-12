@@ -17,7 +17,7 @@
 #
 
 typeset -r SCRIPT_NAME="cd-bookmark"
-typeset -r CD_BOOKMARK_FILE=~/.cdbookmark
+typeset -r BOOKMARK_FILE=~/.cdbookmark
 
 function print_usage()
 {
@@ -47,25 +47,25 @@ function print_error()
 }
 
 function edit_bookmark() {
-  # open CD_BOOKMARK_FILE with EDITOR.
-  ${EDITOR:-vi} "$CD_BOOKMARK_FILE"
+  # open BOOKMARK_FILE with EDITOR.
+  ${EDITOR:-vi} "$BOOKMARK_FILE"
 }
 
 function list_bookmark() {
-  cat "$CD_BOOKMARK_FILE" | sort -n
+  cat "$BOOKMARK_FILE" | sort -n
 }
 
 function list_bookmark_path() {
-  cat "$CD_BOOKMARK_FILE" | cut -d '|' -f 2
+  cat "$BOOKMARK_FILE" | cut -d '|' -f 2
 }
 
 function list_bookmark_id() {
-  cat "$CD_BOOKMARK_FILE" | cut -d '|' -f 1
+  cat "$BOOKMARK_FILE" | cut -d '|' -f 1
 }
 
 function get_bookmark() {
   escaped_bmid=$(echo "$1" | sed -e 's/[^a-zA-Z0-9<>]/\\&/g')
-  cat "$CD_BOOKMARK_FILE" | grep -E "^${escaped_bmid}\\|" | cut -d '|' -f 2 | head -n 1
+  cat "$BOOKMARK_FILE" | grep -E "^${escaped_bmid}\\|" | cut -d '|' -f 2 | head -n 1
 }
 
 function add_to_bookmark() {
@@ -94,7 +94,7 @@ function add_to_bookmark() {
     fi
   fi
 
-  echo "$newid|$bmdir" >> "$CD_BOOKMARK_FILE"
+  echo "$newid|$bmdir" >> "$BOOKMARK_FILE"
 }
 # main function
 function cdbookmark() {
