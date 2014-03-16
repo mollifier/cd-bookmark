@@ -68,6 +68,17 @@ function get_bookmark() {
   cat "$BOOKMARK_FILE" | grep -E "^${escaped_bmid}\\|" | cut -d '|' -f 2 | head -n 1
 }
 
+function cd_to_bookmark() {
+  local bookmark_id="$1"
+  local bookmark_dir=$(get_bookmark "$bookmark_id")
+  if [ -z "$bookmark_dir" ]; then
+    print_error "$bookmark_id is not in bookmark list" 1>&2
+    return 1
+  fi
+
+  cd "$bookmark_dir"
+}
+
 function add_to_bookmark() {
   local bmdir=$PWD
   local newid=$1
@@ -99,8 +110,26 @@ function add_to_bookmark() {
 # main function
 function cdbookmark() {
 
-  while getopts ':h' option; do
+  # mode : add, cd, list, edit
+  local mode=""
+  local bookmark_id=""
+
+  while getopts ':a:c:leh' option; do
     case $option in
+      a)
+        bookmark_id="$OPTARG"
+        mode="add"
+        ;;
+      c)
+        bookmark_id="$OPTARG"
+        mode="cd"
+        ;;
+      l)
+        mode="list"
+        ;;
+      e)
+        mode="edit"
+        ;;
       h)
         print_usage
         return 0
@@ -117,19 +146,31 @@ function cdbookmark() {
   done
   shift $(expr $OPTIND - 1)
 
-  local bmid=$1
-  if [ -z "$bmid" ]; then
-    list_bookmark
-    return
+  # with no option, cd or list bookmarks
+  if [ -n "$mode" ]; then
+    bookmark_id="$1"
+
+    if [ -n "$bookmark_id" ]; then
+      mode="cd"
+    else
+      mode="list"
+    fi
   fi
 
-  local bmdir=$(get_bookmark "$bmid")
-  if [ -z "$bmdir" ]; then
-    echo "$bmid is not in bm list" 1>&2
-    return 1
-  fi
-
-  cd "$bmdir"
+  case "$mode" in
+    add)
+      add_to_bookmark "$bookmark_id"
+      ;;
+    cd)
+      cd_to_bookmark "$bookmark_id"
+      ;;
+    list)
+      list_bookmark
+      ;;
+    edit)
+      edit_bookmark
+      ;;
+  esac
 }
 
 cdbookmark "$@"
