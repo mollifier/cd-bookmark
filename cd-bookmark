@@ -12,8 +12,9 @@
 #
 #     autoload -Uz cd-bookmark
 #
-# Usage:
-#   cd-bookmark [PATH]
+# Usage: cd-bookmark -a [BOOKMARK_ID]
+#    or: cd-bookmark [-c] BOOKMARK_ID
+#    or: cd-bookmark [-l]
 #
 
 typeset -r SCRIPT_NAME="cd-bookmark"
