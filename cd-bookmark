@@ -80,32 +80,32 @@ function cd_to_bookmark() {
 }
 
 function add_to_bookmark() {
-  local bmdir=$PWD
-  local newid=$1
+  local new_bookmark_id="$1"
+  local bookmark_dir="$2"
 
-  if list_bookmark_path | grep -F -x "$bmdir" > /dev/null; then
-    echo "$bmdir is already in bm list" 1>&2
+  if list_bookmark_path | grep -F -x "$bookmark_dir" > /dev/null; then
+    echo "$bookmark_dir is already in bm list" 1>&2
     return 2
   fi
 
-  if [ -n "$newid" ]; then
-    if list_bookmark_id | grep -F -x "$newid" > /dev/null; then
-      echo "$newid is already used as bm id" 1>&2
+  if [ -n "$new_bookmark_id" ]; then
+    if list_bookmark_id | grep -F -x "$new_bookmark_id" > /dev/null; then
+      echo "$new_bookmark_id is already used as bm id" 1>&2
       return 3
     fi
   fi
 
-  if [ -z $newid ]; then
+  if [ -z $new_bookmark_id ]; then
     local maxid
     maxid=$(list_bookmark_id | grep '^[0-9][0-9]*$' | sort -n -r | head -1)
     if [ -n "$maxid" ] && [ "$maxid" -ge 1 ]; then
-      newid=$((maxid + 1))
+      new_bookmark_id=$((maxid + 1))
     else
-      newid=1
+      new_bookmark_id=1
     fi
   fi
 
-  echo "$newid|$bmdir" >> "$BOOKMARK_FILE"
+  echo "$new_bookmark_id|$bookmark_dir" >> "$BOOKMARK_FILE"
 }
 # main function
 function cdbookmark() {
@@ -159,7 +159,7 @@ function cdbookmark() {
 
   case "$mode" in
     add)
-      add_to_bookmark "$bookmark_id"
+      add_to_bookmark "$bookmark_id" "$PWD"
       ;;
     cd)
       cd_to_bookmark "$bookmark_id"
