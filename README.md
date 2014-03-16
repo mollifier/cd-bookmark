@@ -1,0 +1,84 @@
+# cd-bookmark
+
+## Synopsis
+zsh plugin to bookmark directories to cd.
+
+Inspired by [mokemokechicken post](http://qiita.com/mokemokechicken/items/69af0db3e2cd27c1c467)
+
+## How to set up
+Put cd-bookmark and _cd-bookmark files somewhere in your $fpath and add this line to your .zshrc:
+
+```
+autoload -Uz cd-bookmark
+```
+
+You can set alias to this function.
+e.g.
+
+```
+alias cdb='cd-bookmark'
+```
+
+## Usage
+
+
+```
+# 1st form
+% cd-bookmark -a [BOOKMARK_ID]
+
+# or
+# 2nd form
+% cd-bookmark [-c] BOOKMARK_ID
+
+# or
+# 3rd form
+% cd-bookmark [-l]
+```
+
+In the 1st form, add current directory to bookmark with <var>BOOKMARK\_ID</var>.
+<var>BOOKMARK\_ID</var> is used as a key in bookmark.
+
+In the 2nd form, find directory by <var>BOOKMARK\_ID</var> and change directory to it.
+
+In the 3rd form, list current bookmark.
+
+## Options
+* __-a__ <var>[BOOKMARK\_ID]</var>  add current directory to bookmark<br />
+                                with no BOOKMARK\_ID, automatically use free ID number as BOOKMARK\_ID
+* __-c__ <var>BOOKMARK\_ID</var>   change directory which is identified by BOOKMARK\_ID
+* __-l__                           list bookmark
+* __-e__                           edit bookmark file
+* __-h__                           display this help and exit
+
+## Examples
+
+```
+# Current directory is '/home/mollifier/work'.
+% pwd
+/home/mollifier/work
+
+# Add current directory to bookmark. It's bookmark ID is 'work'.
+% cd-bookmark -a work
+
+# cd somewhere.
+% cd
+
+# Back to 'work' directory.
+% cd-bookmark work
+% pwd
+/home/mollifier/work
+
+# Add another directory to bookmark.
+% cd /home/mollifier/tmp
+% cd-bookmark -a tmp
+
+# To show current bookmark, run cd-bookmark without any options or with -l option.
+% cd-bookmark
+tmp|/home/mollifier/tmp
+work|/home/mollifier/work
+
+# To edit bookmark, run cd-bookmark with -e option.
+% cd-bookmark -e
+# Open bookmark file with $EDITOR (vim, emacs, etc.), so you can edit bookmark.
+```
+
