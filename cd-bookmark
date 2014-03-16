@@ -122,11 +122,9 @@ function cdbookmark() {
   local mode=""
   local bookmark_id=""
 
-  while getopts ':a:c:leh' option; do
+  while getopts ':ac:leh' option; do
     case $option in
-      # TODO : OPTARG for -a option is optional
       a)
-        bookmark_id="$OPTARG"
         mode="add"
         ;;
       c)
@@ -154,6 +152,11 @@ function cdbookmark() {
     esac
   done
   shift $(expr $OPTIND - 1)
+
+  if [ "$mode" = "add" ]; then
+    # argument for -a option is omittable
+    bookmark_id="$1"
+  fi
 
   # with no option, cd or list bookmarks
   if [ -z "$mode" ]; then
