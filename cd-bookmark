@@ -68,12 +68,20 @@ function get_bookmark() {
   cat "$BOOKMARK_FILE" | grep -E "^${escaped_bmid}\\|" | cut -d '|' -f 2 | head -n 1
 }
 
+function init_bookmark() {
+  if [ -r "$BOOKMARK_FILE" ]; then
+    return 0
+  else
+    touch "$BOOKMARK_FILE"
+  fi
+}
+
 function cd_to_bookmark() {
   local bookmark_id="$1"
   local bookmark_dir=$(get_bookmark "$bookmark_id")
   if [ -z "$bookmark_dir" ]; then
     print_error "$bookmark_id is not in bookmark" 1>&2
-    return 1
+    return 3
   fi
 
   cd "$bookmark_dir"
@@ -91,7 +99,7 @@ function add_to_bookmark() {
   if [ -n "$new_bookmark_id" ]; then
     if list_bookmark_id | grep -F -x "$new_bookmark_id" > /dev/null; then
       print_error "$new_bookmark_id is already used as bookmark id"
-      return 3
+      return 2
     fi
   fi
 
@@ -107,15 +115,16 @@ function add_to_bookmark() {
 
   echo "$new_bookmark_id|$bookmark_dir" >> "$BOOKMARK_FILE"
 }
+
 # main function
 function cdbookmark() {
-
   # mode : add, cd, list, edit
   local mode=""
   local bookmark_id=""
 
   while getopts ':a:c:leh' option; do
     case $option in
+      # TODO : OPTARG for -a option is optional
       a)
         bookmark_id="$OPTARG"
         mode="add"
@@ -147,7 +156,7 @@ function cdbookmark() {
   shift $(expr $OPTIND - 1)
 
   # with no option, cd or list bookmarks
-  if [ -n "$mode" ]; then
+  if [ -z "$mode" ]; then
     bookmark_id="$1"
 
     if [ -n "$bookmark_id" ]; then
@@ -155,6 +164,11 @@ function cdbookmark() {
     else
       mode="list"
     fi
+  fi
+
+  if ! init_bookmark; then
+    print_error "Could not init bookmark file."
+    return 1
   fi
 
   case "$mode" in
@@ -173,6 +187,12 @@ function cdbookmark() {
   esac
 }
 
+#set -o xtrace
+#set -o verbose
+
 cdbookmark "$@"
+
+#set +o xtrace
+#set +o verbose
 
 # vim:set ft=zsh:
