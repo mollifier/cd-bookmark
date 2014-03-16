@@ -65,8 +65,8 @@ function list_bookmark_id() {
 }
 
 function get_bookmark() {
-  escaped_bmid=$(echo "$1" | sed -e 's/[^a-zA-Z0-9<>]/\\&/g')
-  cat "$BOOKMARK_FILE" | grep -E "^${escaped_bmid}\\|" | cut -d '|' -f 2 | head -n 1
+  escaped_id=$(echo "$1" | sed -e 's/[^a-zA-Z0-9<>]/\\&/g')
+  cat "$BOOKMARK_FILE" | grep -E "^${escaped_id}\\|" | cut -d '|' -f 2 | head -n 1
 }
 
 function init_bookmark() {
@@ -81,7 +81,7 @@ function cd_to_bookmark() {
   local bookmark_id="$1"
   local bookmark_dir=$(get_bookmark "$bookmark_id")
   if [ -z "$bookmark_dir" ]; then
-    print_error "$bookmark_id is not in bookmark" 1>&2
+    print_error "$bookmark_id is not in bookmark"
     return 3
   fi
 
@@ -93,7 +93,7 @@ function add_to_bookmark() {
   local new_bookmark_id="$2"  # optional
 
   if list_bookmark_path | grep -F -x "$bookmark_dir" > /dev/null; then
-    print_error "$bookmark_dir is already in bookmark" 1>&2
+    print_error "$bookmark_dir is already in bookmark"
     return 2
   fi
 
