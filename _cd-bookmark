@@ -1,0 +1,59 @@
+#compdef cd-bookmark
+# ------------------------------------------------------------------------------
+# Copyright (c) 2014 Hideaki Miyake
+# Licensed under the MIT License (MIT)
+# ------------------------------------------------------------------------------
+# Description
+# -----------
+#
+#  Completion script for cd-bookmark (https://github.com/mollifier/cd-bookmark)
+#
+# ------------------------------------------------------------------------------
+# Authors
+# -------
+#
+#  * Hideaki Miyake (https://github.com/mollifier)
+#
+# ------------------------------------------------------------------------------
+
+declare -a opts args
+args=(
+  '(:)-a[add current directory to bookmark]:new_bookmark_id:_cd-bookmark_current_directory_name'
+  '-c[change directory which is identified by BOOKMARK_ID]:bookmark_id:_cd-bookmark_bookmark_id'
+  '-l[list bookmark]'
+  '-e[edit bookmark file]'
+  '-h[display this help and exit]'
+  '1:bookmark_id:_cd-bookmark_bookmark_id'
+)
+local curcontext=$curcontext state line ret=1
+declare -A opt_args
+
+# show current directory name
+(( $+functions[_cd-bookmark_current_directory_name] )) ||
+_cd-bookmark_current_directory_name() {
+  local -a directory_name
+  directory_name=( "${PWD:t}" )
+  _describe -t current_directory_name "current directory name" directory_name
+}
+
+# show bookmark id list
+(( $+functions[_cd-bookmark_bookmark_id] )) ||
+_cd-bookmark_bookmark_id() {
+  local -a _bookmark_id_list
+  _bookmark_id_list=( ${(@f)"$(_call_program cd-bookmark-list cd-bookmark -l | cut -d '|' -f 1 | sort -n)"} )
+  _describe -t bookmark_id "bookmark id" _bookmark_id_list
+}
+
+_arguments -C $opts \
+  $args && ret=0
+
+return $ret
+
+# Local Variables:
+# mode: Shell-Script
+# sh-indentation: 2
+# indent-tabs-mode: nil
+# sh-basic-offset: 2
+# End:
+# vim: ft=zsh sw=2 ts=2 et
+
