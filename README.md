@@ -3,7 +3,9 @@
 ## Synopsis
 zsh plugin to bookmark directories to cd.
 
-Inspired by [mokemokechicken post](http://qiita.com/mokemokechicken/items/69af0db3e2cd27c1c467)
+Inspired by [mokemokechicken post](http://qiita.com/mokemokechicken/items/69af0db3e2cd27c1c467) and shell script in the post.
+
+This plugin is forked from the script. The original script is licensed under the [MIT License](http://mokemokechicken.mit-license.org/).
 
 ## How to set up
 Put cd-bookmark and _cd-bookmark files somewhere in your $fpath and add this line to your .zshrc:
