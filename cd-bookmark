@@ -20,8 +20,7 @@
 typeset -r SCRIPT_NAME="cd-bookmark"
 typeset -r BOOKMARK_FILE=~/.cdbookmark
 
-function print_usage()
-{
+function _cdbookmark_print_usage() {
     cat << EOF
 Usage: $SCRIPT_NAME -a [BOOKMARK_ID]  (1st form)
   or:  $SCRIPT_NAME [-c] BOOKMARK_ID  (2nd form)
@@ -41,35 +40,34 @@ In the 3rd form, list current bookmark.
 EOF
 }
 
-function print_error()
-{
+function _cdbookmark_print_error() {
     echo "$SCRIPT_NAME: $@" 1>&2
     echo "Try \`-h' option for more information." 1>&2
 }
 
-function edit_bookmark() {
+function _cdbookmark_edit_bookmark() {
   # open BOOKMARK_FILE with EDITOR.
   ${EDITOR:-vi} "$BOOKMARK_FILE"
 }
 
-function list_bookmark() {
+function _cdbookmark_list_bookmark() {
   cat "$BOOKMARK_FILE" | sort -n
 }
 
-function list_bookmark_path() {
+function _cdbookmark_list_bookmark_path() {
   cat "$BOOKMARK_FILE" | cut -d '|' -f 2
 }
 
-function list_bookmark_id() {
+function _cdbookmark_list_bookmark_id() {
   cat "$BOOKMARK_FILE" | cut -d '|' -f 1
 }
 
-function get_bookmark() {
+function _cdbookmark_get_bookmark() {
   escaped_id=$(echo "$1" | sed -e 's/[^a-zA-Z0-9<>]/\\&/g')
   cat "$BOOKMARK_FILE" | grep -E "^${escaped_id}\\|" | cut -d '|' -f 2 | head -n 1
 }
 
-function init_bookmark() {
+function _cdbookmark_init_bookmark() {
   if [ -r "$BOOKMARK_FILE" ]; then
     return 0
   else
@@ -77,36 +75,36 @@ function init_bookmark() {
   fi
 }
 
-function cd_to_bookmark() {
+function _cdbookmark_cd_to_bookmark() {
   local bookmark_id="$1"
-  local bookmark_dir=$(get_bookmark "$bookmark_id")
+  local bookmark_dir=$(_cdbookmark_get_bookmark "$bookmark_id")
   if [ -z "$bookmark_dir" ]; then
-    print_error "$bookmark_id is not in bookmark"
+    _cdbookmark_print_error "$bookmark_id is not in bookmark"
     return 3
   fi
 
   cd "$bookmark_dir"
 }
 
-function add_to_bookmark() {
+function _cdbookmark_add_to_bookmark() {
   local bookmark_dir="$1"
   local new_bookmark_id="$2"  # optional
 
-  if list_bookmark_path | grep -F -x "$bookmark_dir" > /dev/null; then
-    print_error "$bookmark_dir is already in bookmark"
+  if _cdbookmark_list_bookmark_path | grep -F -x "$bookmark_dir" > /dev/null; then
+    _cdbookmark_print_error "$bookmark_dir is already in bookmark"
     return 2
   fi
 
   if [ -n "$new_bookmark_id" ]; then
-    if list_bookmark_id | grep -F -x "$new_bookmark_id" > /dev/null; then
-      print_error "$new_bookmark_id is already used as bookmark id"
+    if _cdbookmark_list_bookmark_id | grep -F -x "$new_bookmark_id" > /dev/null; then
+      _cdbookmark_print_error "$new_bookmark_id is already used as bookmark id"
       return 2
     fi
   fi
 
   if [ -z $new_bookmark_id ]; then
     local maxid
-    maxid=$(list_bookmark_id | grep '^[0-9][0-9]*$' | sort -n -r | head -1)
+    maxid=$(_cdbookmark_list_bookmark_id | grep '^[0-9][0-9]*$' | sort -n -r | head -1)
     if [ -n "$maxid" ] && [ "$maxid" -ge 1 ]; then
       new_bookmark_id=$((maxid + 1))
     else
@@ -118,7 +116,7 @@ function add_to_bookmark() {
 }
 
 # main function
-function cdbookmark() {
+function _cdbookmark_main() {
   # mode : add, cd, list, edit
   local mode=""
   local bookmark_id=""
@@ -139,15 +137,15 @@ function cdbookmark() {
         mode="edit"
         ;;
       h)
-        print_usage
+        _cdbookmark_print_usage
         return 0
         ;;
       :)
-        print_error "option requires an argument -- $OPTARG"
+        _cdbookmark_print_error "option requires an argument -- $OPTARG"
         return 1
         ;;
       *)
-        print_error "invalid option -- $OPTARG"
+        _cdbookmark_print_error "invalid option -- $OPTARG"
         return 1
         ;;
     esac
@@ -170,23 +168,23 @@ function cdbookmark() {
     fi
   fi
 
-  if ! init_bookmark; then
-    print_error "Could not init bookmark file."
+  if ! _cdbookmark_init_bookmark; then
+    _cdbookmark_print_error "Could not init bookmark file."
     return 1
   fi
 
   case "$mode" in
     add)
-      add_to_bookmark "$PWD" "$bookmark_id"
+      _cdbookmark_add_to_bookmark "$PWD" "$bookmark_id"
       ;;
     cd)
-      cd_to_bookmark "$bookmark_id"
+      _cdbookmark_cd_to_bookmark "$bookmark_id"
       ;;
     list)
-      list_bookmark
+      _cdbookmark_list_bookmark
       ;;
     edit)
-      edit_bookmark
+      _cdbookmark_edit_bookmark
       ;;
   esac
 }
@@ -194,7 +192,7 @@ function cdbookmark() {
 #set -o xtrace
 #set -o verbose
 
-cdbookmark "$@"
+_cdbookmark_main "$@"
 
 #set +o xtrace
 #set +o verbose
