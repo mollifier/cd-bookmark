@@ -121,6 +121,7 @@ function _cdbookmark_main() {
   local mode=""
   local bookmark_id=""
 
+  local option OPTARG OPTIND
   while getopts ':ac:leh' option; do
     case $option in
       a)
