@@ -28,14 +28,19 @@ Usage: $SCRIPT_NAME -a [BOOKMARK_ID]  (1st form)
 $SCRIPT_NAME is a command to bookmark directories.
 In the 1st form, add current directory to bookmark with BOOKMARK_ID.
 BOOKMARK_ID is used as a key in bookmark.
-In the 2nd form, find directory by BOOKMARK_ID and change directory to it.
+In the 2nd form, find directory by BOOKMARK_ID and move to it.
 In the 3rd form, list current bookmark.
+
+In the 2nd form, you can add relative path from bookmark real path at the end of BOOKMARK_ID.
+For example if 'cd-bookmark work' command will change current directory to '~/work',
+'cd-bookmark work/project/zsh' command changes current directory to '~/work/project/zsh'.
 
   -a [BOOKMARK_ID]   add current directory to bookmark
                      with no BOOKMARK_ID, automatically use free ID number as BOOKMARK_ID
   -c BOOKMARK_ID     change directory which is identified by BOOKMARK_ID
   -l                 list bookmark
   -e                 edit bookmark file
+  -p BOOKMARK_ID     display bookmark real path for BOOKMARK_ID
   -h                 display this help and exit
 EOF
 }
@@ -78,8 +83,26 @@ function _cdbookmark_init_bookmark() {
 function _cdbookmark_cd_to_bookmark() {
   local bookmark_id="$1"
   local bookmark_dir=$(_cdbookmark_get_bookmark "$bookmark_id")
+
+  if [ -z "$bookmark_dir" ]; then
+    if [[ "$bookmark_id" == */* ]]; then
+      local strip_bookmark_id="${bookmark_id%%/*}"
+      local dir_path="${bookmark_id#*/}"
+      bookmark_dir=$(_cdbookmark_get_bookmark "$strip_bookmark_id")
+
+      if [ -n "$bookmark_dir" ]; then
+        bookmark_dir="${bookmark_dir}/${dir_path}"
+      fi
+    fi
+  fi
+
   if [ -z "$bookmark_dir" ]; then
     _cdbookmark_print_error "$bookmark_id is not in bookmark"
+    return 3
+  fi
+
+  if [ ! -d "$bookmark_dir" ]; then
+    _cdbookmark_print_error "no such directory: $bookmark_dir"
     return 3
   fi
 
@@ -117,12 +140,12 @@ function _cdbookmark_add_to_bookmark() {
 
 # main function
 function _cdbookmark_main() {
-  # mode : add, cd, list, edit
+  # mode : add, cd, list, edit, show
   local mode=""
   local bookmark_id=""
 
   local option OPTARG OPTIND
-  while getopts ':ac:leh' option; do
+  while getopts ':ac:lep:h' option; do
     case $option in
       a)
         mode="add"
@@ -136,6 +159,10 @@ function _cdbookmark_main() {
         ;;
       e)
         mode="edit"
+        ;;
+      p)
+        bookmark_id="$OPTARG"
+        mode="show"
         ;;
       h)
         _cdbookmark_print_usage
@@ -186,6 +213,15 @@ function _cdbookmark_main() {
       ;;
     edit)
       _cdbookmark_edit_bookmark
+      ;;
+    show)
+      local bookmark_dir=$(_cdbookmark_get_bookmark "$bookmark_id")
+      if [ -z "$bookmark_dir" ]; then
+        _cdbookmark_print_error "$bookmark_id is not in bookmark"
+        return 3
+      else
+        echo "$bookmark_dir"
+      fi
       ;;
   esac
 }

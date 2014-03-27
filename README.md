@@ -40,7 +40,7 @@ alias cdb='cd-bookmark'
 In the 1st form, add current directory to bookmark with <var>BOOKMARK\_ID</var>.
 <var>BOOKMARK\_ID</var> is used as a key in bookmark.
 
-In the 2nd form, find directory by <var>BOOKMARK\_ID</var> and change directory to it.
+In the 2nd form, find directory by <var>BOOKMARK\_ID</var> and change directory to it. In this form, you can add relative path from bookmark real path at the end of BOOKMARK\_ID (see example below).
 
 In the 3rd form, list current bookmark.
 
@@ -50,6 +50,7 @@ In the 3rd form, list current bookmark.
 * __-c__ <var>BOOKMARK\_ID</var>   change directory which is identified by BOOKMARK\_ID
 * __-l__                           list bookmark
 * __-e__                           edit bookmark file
+* __-p__ <var>BOOKMARK\_ID</var>   display bookmark real path for BOOKMARK\_ID
 * __-h__                           display this help and exit
 
 ## Examples
@@ -78,6 +79,11 @@ In the 3rd form, list current bookmark.
 % cd-bookmark
 tmp|/home/mollifier/tmp
 work|/home/mollifier/work
+
+# You can add relative path from bookmark real path at the end of BOOKMARK_ID.
+% cd-bookmark work/project/zsh
+% pwd
+/home/mollifier/work/project/zsh
 
 # To edit bookmark, run cd-bookmark with -e option.
 % cd-bookmark -e

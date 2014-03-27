@@ -19,11 +19,12 @@
 declare -a opts args
 args=(
   '(:)-a[add current directory to bookmark]:new_bookmark_id:_cd-bookmark_current_directory_name'
-  '-c[change directory which is identified by BOOKMARK_ID]:bookmark_id:_cd-bookmark_bookmark_id'
+  '-c[change directory which is identified by BOOKMARK_ID]:bookmark_id:->bookmark_id_or_path'
   '-l[list bookmark]'
   '-e[edit bookmark file]'
+  '-p[display bookmark real path for BOOKMARK_ID]:bookmark_id:_cd-bookmark_bookmark_id'
   '-h[display this help and exit]'
-  '1:bookmark_id:_cd-bookmark_bookmark_id'
+  '1:bookmark_id:->bookmark_id_or_path'
 )
 local curcontext=$curcontext state line ret=1
 declare -A opt_args
@@ -44,8 +45,33 @@ _cd-bookmark_bookmark_id() {
   _describe -t bookmark_id "bookmark id" _bookmark_id_list
 }
 
+(( $+functions[_cd-bookmark_bookmark_id_compset] )) ||
+_cd-bookmark_bookmark_id_compset() {
+  local -a _bookmark_id_list
+  _bookmark_id_list=( ${(@f)"$(_call_program cd-bookmark-list cd-bookmark -l | cut -d '|' -f 1 | sort -n)"} )
+  compadd -S '/' -q -a _bookmark_id_list
+}
+
+# expand bookmark_id to real path and complete subdirectory
+(( $+functions[_cd-bookmark_expand_bookmark_id] )) ||
+_cd-bookmark_expand_bookmark_id() {
+  local bookmark_id="${IPREFIX%/}"
+  local real_path="$(_call_program cd-bookmark-expand-id cd-bookmark -p "$bookmark_id")"
+  _path_files -W "$real_path" -/
+}
+
 _arguments -C $opts \
   $args && ret=0
+
+case "$state" in
+  bookmark_id_or_path)
+    if compset -P 1 '*/'; then
+      _cd-bookmark_expand_bookmark_id
+    else
+      _cd-bookmark_bookmark_id_compset
+    fi
+    ;;
+esac
 
 return $ret
 
