@@ -45,13 +45,18 @@ In the 2nd form, find directory by <var>BOOKMARK\_ID</var> and change directory 
 In the 3rd form, list current bookmark.
 
 ## Options
-* __-a__ <var>[BOOKMARK\_ID]</var>  add current directory to bookmark<br />
+* `-a` <var>[BOOKMARK\_ID]</var>  add current directory to bookmark<br />
                                 with no BOOKMARK\_ID, automatically use free ID number as BOOKMARK\_ID
-* __-c__ <var>BOOKMARK\_ID</var>   change directory which is identified by BOOKMARK\_ID
-* __-l__                           list bookmark
-* __-e__                           edit bookmark file
-* __-p__ <var>BOOKMARK\_ID</var>   display bookmark real path for BOOKMARK\_ID
-* __-h__                           display this help and exit
+* `-c` <var>BOOKMARK\_ID</var>   change directory which is identified by BOOKMARK\_ID
+* `-l`                           list bookmark
+* `-e`                           edit bookmark file
+* `-p` <var>BOOKMARK\_ID</var>   display bookmark real path for BOOKMARK\_ID
+* `-h`                           display this help and exit
+
+## Variables
+
+Bookmark list are stored in `~/.cdbookmark` file. This file name can be changed by `CD_BOOKMARK_FILE` variable.
+
 
 ## Examples
 

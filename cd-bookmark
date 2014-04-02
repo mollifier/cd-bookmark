@@ -18,7 +18,7 @@
 #
 
 typeset -r SCRIPT_NAME="cd-bookmark"
-typeset -r BOOKMARK_FILE=~/.cdbookmark
+typeset -r BOOKMARK_FILE="${CD_BOOKMARK_FILE:-${HOME}/.cdbookmark}"
 
 function _cdbookmark_print_usage() {
     cat << EOF
