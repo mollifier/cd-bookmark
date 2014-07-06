@@ -8,10 +8,20 @@ Inspired by [mokemokechicken post](http://qiita.com/mokemokechicken/items/69af0d
 This plugin is forked from the script. The original script is licensed under the [MIT License](http://mokemokechicken.mit-license.org/).
 
 ## How to set up
-Put cd-bookmark and _cd-bookmark files somewhere in your $fpath and add this line to your .zshrc:
+
+### Manually install
+
+Put cd-bookmark and _cd-bookmark files somewhere in your $fpath and add the following line to your .zshrc:
 
 ```
 autoload -Uz cd-bookmark
+```
+
+### Installing using Antigen
+If you use [Antigen](https://github.com/zsh-users/antigen), add the following line to your .zshrc:
+
+```
+antigen bundle mollifier/cd-bookmark
 ```
 
 You can set alias to this function.
