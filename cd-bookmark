@@ -68,7 +68,7 @@ function _cdbookmark_list_bookmark_id() {
 }
 
 function _cdbookmark_get_bookmark() {
-  escaped_id=$(echo "$1" | sed -e 's/[^a-zA-Z0-9<>]/\\&/g')
+  local escaped_id="$(echo $1 | sed -e 's/[^a-zA-Z0-9<>]/\\&/g')"
   cat "$BOOKMARK_FILE" | grep -E "^${escaped_id}\\|" | cut -d '|' -f 2 | head -n 1
 }
 
@@ -82,13 +82,13 @@ function _cdbookmark_init_bookmark() {
 
 function _cdbookmark_cd_to_bookmark() {
   local bookmark_id="$1"
-  local bookmark_dir=$(_cdbookmark_get_bookmark "$bookmark_id")
+  local bookmark_dir="$(_cdbookmark_get_bookmark $bookmark_id)"
 
   if [ -z "$bookmark_dir" ]; then
     if [[ "$bookmark_id" == */* ]]; then
       local strip_bookmark_id="${bookmark_id%%/*}"
       local dir_path="${bookmark_id#*/}"
-      bookmark_dir=$(_cdbookmark_get_bookmark "$strip_bookmark_id")
+      bookmark_dir="$(_cdbookmark_get_bookmark $strip_bookmark_id)"
 
       if [ -n "$bookmark_dir" ]; then
         bookmark_dir="${bookmark_dir}/${dir_path}"
@@ -106,7 +106,7 @@ function _cdbookmark_cd_to_bookmark() {
     return 3
   fi
 
-  cd "$bookmark_dir"
+  cd -- "$bookmark_dir"
 }
 
 function _cdbookmark_add_to_bookmark() {
@@ -215,7 +215,7 @@ function _cdbookmark_main() {
       _cdbookmark_edit_bookmark
       ;;
     show)
-      local bookmark_dir=$(_cdbookmark_get_bookmark "$bookmark_id")
+      local bookmark_dir="$(_cdbookmark_get_bookmark $bookmark_id)"
       if [ -z "$bookmark_dir" ]; then
         _cdbookmark_print_error "$bookmark_id is not in bookmark"
         return 3
