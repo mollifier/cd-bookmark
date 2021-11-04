@@ -46,8 +46,8 @@ EOF
 }
 
 function _cdbookmark_print_error() {
-    echo "$SCRIPT_NAME: $@" 1>&2
-    echo "Try \`-h' option for more information." 1>&2
+  echo "$SCRIPT_NAME: $@" 1>&2
+  echo "Try \`-h' option for more information." 1>&2
 }
 
 function _cdbookmark_edit_bookmark() {
