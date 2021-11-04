@@ -51,6 +51,10 @@ function _cdbookmark_print_error() {
   echo "Try \`-h' option for more information." 1>&2
 }
 
+function _cdbookmark_escape_id() {
+  echo $1 | sed -e 's/[^a-zA-Z0-9<>]/\\&/g'
+}
+
 function _cdbookmark_delete_bookmark() {
   local bookmark_id="$1"
   local bookmark_dir="$(_cdbookmark_get_bookmark $bookmark_id)"
@@ -60,7 +64,7 @@ function _cdbookmark_delete_bookmark() {
     return 4
   fi
 
-  local escaped_id="$(echo $bookmark_id | sed -e 's/[^a-zA-Z0-9<>]/\\&/g')"
+  local escaped_id="$(_cdbookmark_escape_id $1)"
   # To be compatiable with both GNU sed and the old BSD sed that macOS uses, need to set and inplace backup extension and then remove the file.
   # Reference: https://unix.stackexchange.com/a/131940/19909
   sed -i.bak -e "/^${escaped_id}|/d" "$BOOKMARK_FILE" && rm "$BOOKMARK_FILE.bak"
@@ -84,7 +88,7 @@ function _cdbookmark_list_bookmark_id() {
 }
 
 function _cdbookmark_get_bookmark() {
-  local escaped_id="$(echo $1 | sed -e 's/[^a-zA-Z0-9<>]/\\&/g')"
+  local escaped_id="$(_cdbookmark_escape_id $1)"
   cat "$BOOKMARK_FILE" | grep -E "^${escaped_id}\\|" | cut -d '|' -f 2 | head -n 1
 }
 
