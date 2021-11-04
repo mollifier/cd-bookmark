@@ -38,6 +38,7 @@ For example if 'cd-bookmark work' command will change current directory to '~/wo
   -a [BOOKMARK_ID]   add current directory to bookmark
                      with no BOOKMARK_ID, automatically use free ID number as BOOKMARK_ID
   -c BOOKMARK_ID     change directory which is identified by BOOKMARK_ID
+  -d BOOKMARK_ID     delete directory which is identified by BOOKMARK_ID
   -l                 list bookmark
   -e                 edit bookmark file
   -p BOOKMARK_ID     display bookmark real path for BOOKMARK_ID
@@ -48,6 +49,21 @@ EOF
 function _cdbookmark_print_error() {
   echo "$SCRIPT_NAME: $@" 1>&2
   echo "Try \`-h' option for more information." 1>&2
+}
+
+function _cdbookmark_delete_bookmark() {
+  local bookmark_id="$1"
+  local bookmark_dir="$(_cdbookmark_get_bookmark $bookmark_id)"
+
+  if [ -z "$bookmark_dir" ]; then
+    _cdbookmark_print_error "$bookmark_id is not in bookmark"
+    return 4
+  fi
+
+  local escaped_id="$(echo $bookmark_id | sed -e 's/[^a-zA-Z0-9<>]/\\&/g')"
+  # To be compatiable with both GNU sed and the old BSD sed that macOS uses, need to set and inplace backup extension and then remove the file.
+  # Reference: https://unix.stackexchange.com/a/131940/19909
+  sed -i.bak -e "/^${escaped_id}|/d" "$BOOKMARK_FILE" && rm "$BOOKMARK_FILE.bak"
 }
 
 function _cdbookmark_edit_bookmark() {
@@ -145,7 +161,7 @@ function _cdbookmark_main() {
   local bookmark_id=""
 
   local option OPTARG OPTIND
-  while getopts ':ac:lep:h' option; do
+  while getopts ':ac:d:lep:h' option; do
     case $option in
       a)
         mode="add"
@@ -153,6 +169,10 @@ function _cdbookmark_main() {
       c)
         bookmark_id="$OPTARG"
         mode="cd"
+        ;;
+      d)
+        bookmark_id="$OPTARG"
+        mode="delete"
         ;;
       l)
         mode="list"
@@ -207,6 +227,9 @@ function _cdbookmark_main() {
       ;;
     cd)
       _cdbookmark_cd_to_bookmark "$bookmark_id"
+      ;;
+    delete)
+      _cdbookmark_delete_bookmark "$bookmark_id"
       ;;
     list)
       _cdbookmark_list_bookmark

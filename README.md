@@ -74,6 +74,7 @@ In the 3rd form, list current bookmark.
 * `-a` <var>[BOOKMARK\_ID]</var>  add current directory to bookmark<br />
                                 with no BOOKMARK\_ID, automatically use free ID number as BOOKMARK\_ID
 * `-c` <var>BOOKMARK\_ID</var>   change directory which is identified by BOOKMARK\_ID
+* `-d` <var>BOOKMARK\_ID</var>   delete directory which is identified by BOOKMARK\_ID
 * `-l`                           list bookmark
 * `-e`                           edit bookmark file
 * `-p` <var>BOOKMARK\_ID</var>   display bookmark real path for BOOKMARK\_ID
@@ -119,5 +120,8 @@ work|/home/mollifier/work
 # To edit bookmark, run cd-bookmark with -e option.
 % cd-bookmark -e
 # Open bookmark file with $EDITOR (vim, emacs, etc.), so you can edit bookmark.
+
+# To delete a bookmark, run cd-bookmark with -d option.
+% cd-bookmark -d work
 ```
 
