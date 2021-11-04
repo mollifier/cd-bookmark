@@ -20,6 +20,7 @@ declare -a opts args
 args=(
   '(:)-a[add current directory to bookmark]:new_bookmark_id:_cd-bookmark_current_directory_name'
   '-c[change directory which is identified by BOOKMARK_ID]:bookmark_id:->bookmark_id_or_path'
+  '-d[delete directory which is identified by BOOKMARK_ID]:bookmark_id:->bookmark_id_or_path'
   '-l[list bookmark]'
   '-e[edit bookmark file]'
   '-p[display bookmark real path for BOOKMARK_ID]:bookmark_id:_cd-bookmark_bookmark_id'
@@ -82,4 +83,3 @@ return $ret
 # sh-basic-offset: 2
 # End:
 # vim: ft=zsh sw=2 ts=2 et
-
