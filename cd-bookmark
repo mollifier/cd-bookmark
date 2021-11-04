@@ -17,8 +17,18 @@
 #    or: cd-bookmark [-l]
 #
 
+function _cdbookmark_get_config_file() {
+  if  ! [ -z ${CD_BOOKMARK_FILE+x} ]; then
+    echo "$CD_BOOKMARK_FILE"
+  elif [ -d ${XDG_CONFIG_HOME:-$HOME/.config}/cd-bookmark ]; then
+    echo "${XDG_CONFIG_HOME:-$HOME/.config}/cd-bookmark/bookmarks"
+  else
+    echo "${HOME}/.cdbookmark"
+  fi
+}
+
 typeset -r SCRIPT_NAME="cd-bookmark"
-typeset -r BOOKMARK_FILE="${CD_BOOKMARK_FILE:-${HOME}/.cdbookmark}"
+typeset -r BOOKMARK_FILE="$(_cdbookmark_get_config_file)"
 
 function _cdbookmark_print_usage() {
     cat << EOF

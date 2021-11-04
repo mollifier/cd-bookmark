@@ -80,8 +80,11 @@ In the 3rd form, list current bookmark.
 * `-h`                           display this help and exit
 
 ## Variables
+The location of the bookmarks list file depends on the envionment's configuration. The file is searched in the following order:
 
-Bookmark list are stored in `~/.cdbookmark` file. This file name can be changed by `CD_BOOKMARK_FILE` variable.
+1. `$CD_BOOKMARK_FILE` -  if it is set. This has highest precedence. Thus you can set this to override to custom location.
+1. `$XDG_CONFIG_HOME/cd-bookmarks/bookmarks` - if the directory `cd-bookmarks/` exist. Note that `$XDG_CONFIG_HOME` defaults to `$HOME/.config`
+1. `$HOME/.cdbookmark` - fall back to old default $HOME/.cdbookmark
 
 
 ## Examples
